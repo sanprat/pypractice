@@ -1,0 +1,23 @@
+config.php
+config.js
+php_errors.log
+*.log
+*.sql
+*.db
+/vendor/
+/node_modules/
+.DS_Store
+php/db_config.php
+php/login.php
+php/register.php
+php/db_test.php
+php/get_codes.php
+php/save_progress.php
+php/test.php
+php/php_errors.log
+.env.save
+python-pwa-practice-zip-EXTRACTED-ARCHIVE/
+schema-sql-EXTRACTED-ARCHIVE/
+python-pwa-practice.zip
+# Ignore database files
+db/*.db
