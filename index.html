@@ -475,7 +475,10 @@ print(f"Current time: {datetime.datetime.now()}")
                     const example = window.basicPythonExamples.find(ex => ex.id === this.value);
                     if (example && editor) {
                         editor.setValue(example.code);
-                        showToast(`Loaded example: ${example.title}`, 'info');
+                        // Only show toast if explicitly selecting an example
+                        if (this.value !== "") {
+                            showToast(`Loaded example: ${example.title}`, 'info');
+                        }
                     }
                 }
             });
@@ -485,7 +488,10 @@ print(f"Current time: {datetime.datetime.now()}")
                     const example = window.advancedPythonExamples.find(ex => ex.id === this.value);
                     if (example && editor) {
                         editor.setValue(example.code);
-                        showToast(`Loaded advanced example: ${example.title}`, 'info');
+                        // Only show toast if explicitly selecting an example
+                        if (this.value !== "") {
+                            showToast(`Loaded advanced example: ${example.title}`, 'info');
+                        }
                     }
                 }
             });
@@ -513,7 +519,7 @@ print(f"Current time: {datetime.datetime.now()}")
                         if (typeof Sk === 'undefined' || typeof Sk.builtin === 'undefined') {
                             console.log('Basic editor (Skulpt) not ready. Please wait or refresh.');
                         }
-                        // Set default basic code
+                        // Set default basic code silently
                         editor.setValue(`# Welcome to Python Practice!
 # Start coding here - You may remove the following examples and start coding on your own
 
@@ -538,7 +544,7 @@ else:
 # Try loops
 for i in range(5):
     print("Count:", i)
-`);
+`, true); // true = don't trigger change events
                     } else { // Advanced mode
                         basicSelect.style.display = 'none';
                         advancedSelect.style.display = 'block';
@@ -556,7 +562,8 @@ for i in range(5):
                                 });
                             }
                         }
-                        // Set default advanced code
+                        
+                        // Set default advanced code silently
                         editor.setValue(`# Welcome to the Advanced Python Editor!
 # Here you can use modern Python 3 features like f-strings
 
@@ -575,7 +582,7 @@ print(f"Random number: {random.randint(1, 100)}")
 print(f"Current time: {datetime.datetime.now()}")
 
 # Select an example from the dropdown to explore more advanced features
-`);
+`, true); // true = don't trigger change events
                     }
                     // Refresh editor to ensure proper rendering after tab switch
                     if (editor) editor.refresh();
@@ -593,12 +600,12 @@ print(f"Current time: {datetime.datetime.now()}")
             toast.classList.add(type);
             
             // Show the toast
-            toast.classList.add('show');
+            // toast.classList.add('show'); // Commented out to disable toast
             
             // Hide after 3 seconds
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+            // setTimeout(() => { // Commented out to disable toast
+            //     toast.classList.remove('show'); // Commented out to disable toast
+            // }, 3000); // Commented out to disable toast
         }
     </script>
     
