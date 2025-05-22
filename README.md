@@ -15,7 +15,7 @@ This project combines elements from both local and remote repositories, providin
 - Exercise library with examples for different Python concepts
 - Hints and example code for learning assistance
 
-### Advanced Mode (Pyodide) - Coming Soon
+### Advanced Mode (Pyodide) 
 - Full Python 3 support with Pyodide
 - Access to Python packages and libraries
 - Advanced code execution capabilities
@@ -44,24 +44,26 @@ The application features a modern, user-friendly interface with:
 
 ### Files Structure
 - `index.html` - Original HTML file
-- `enhanced-index.html` - Enhanced version with improved UI/UX
-- `css/styles.css` - Original CSS styles
-- `css/enhanced-styles.css` - Enhanced CSS with modern design
-- `js/main.js` - Main JavaScript functionality
-- `js/skulpt-setup.js` - Skulpt Python interpreter setup
-- `js/skulpt-completion.js` - Code completion functionality
-- `js/enhanced-ui.js` - Enhanced UI interactions and features
+- `css/enhanced-styles.css` - CSS styles with modern design
+- `js/readme.js` - For reading instructions
+- `js/theme.js` - For light and dark theme
+- `js/ui-helpers.js` -
+- `js/advanced-engine.js` -
+- `js/app-controller.js` -
+- `js/auth.js` -
+- `js/basic-engine.js` -
+- `js/editor.js` -
 
 ## How to Use
 
-1. Open `enhanced-index.html` in a web browser to use the enhanced version
-2. Select an exercise from the sidebar
+1. Go to pybankers.com and click on pypractice link in the navbar which would open the web app
+2. There are 3 tabs, Basic, Advanced and Readme
 3. Write or modify Python code in the editor
 4. Click "Run Code" to execute the Python code
 5. View the output in the console below the editor
 6. Use the toolbar for additional features:
-   - Select examples from the dropdown
-   - Get hints for the current exercise
+   - Read the instructions in readme tab
+   - Get hints from examples in readme tab
    - Reset code to the default example
    - Clear the output console
 
