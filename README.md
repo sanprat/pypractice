@@ -2,10 +2,6 @@
 
 A web-based Python learning platform that allows students to practice Python programming directly in the browser.
 
-## Description
-
-This project combines elements from both local and remote repositories, providing a web-based Python learning platform.
-
 ## Features
 
 ### Basic Mode (Skulpt)
@@ -15,7 +11,7 @@ This project combines elements from both local and remote repositories, providin
 - Exercise library with examples for different Python concepts
 - Hints and example code for learning assistance
 
-### Advanced Mode (Pyodide) 
+### Advanced Mode (Pyodide) - Coming Soon
 - Full Python 3 support with Pyodide
 - Access to Python packages and libraries
 - Advanced code execution capabilities
@@ -64,14 +60,14 @@ The application features a modern, user-friendly interface with:
 
 ## How to Use
 
-1. Go to pybankers.com and click on pypractice link in the navbar which would open the web app
-2. There are 3 tabs, Basic, Advanced and Readme
+1. Open `enhanced-index.html` in a web browser to use the enhanced version
+2. Select an exercise from the sidebar
 3. Write or modify Python code in the editor
 4. Click "Run Code" to execute the Python code
 5. View the output in the console below the editor
 6. Use the toolbar for additional features:
-   - Read the instructions in readme tab
-   - Get hints from examples in readme tab
+   - Select examples from the dropdown
+   - Get hints for the current exercise
    - Reset code to the default example
    - Clear the output console
 

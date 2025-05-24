@@ -1,6 +1,8 @@
+// Interface for the Basic Editor's Python engine (Skulpt)
+
 // Store the most recently executed code for retry after flag detection
-let lastExecutedCode = '';
-let futureFlags = {
+let lastExecutedCodeBasic = '';
+let futureFlagsBasic = {
     print_function: true,
     division: true,
     dunder_round: true,
@@ -20,57 +22,12 @@ let futureFlags = {
     // New flags will be added automatically
 };
 
-// Track code execution count for free usage limit
-// Using a consistent approach without window object references
-let codeExecutionCount = parseInt(localStorage.getItem('pythonPractice_execCount') || '0');
-const MAX_FREE_EXECUTIONS = 6;
-
-// Function to check if the user has reached their free execution limit
-function checkExecutionLimit() {
-    // Skip check if user is logged in
-    if (typeof auth !== 'undefined' && auth.currentUser) {
-        return true; // Logged in users have unlimited executions
-    }
-    
-    // Check execution count for non-logged in users
-    if (codeExecutionCount >= MAX_FREE_EXECUTIONS) {
-        const output = document.getElementById('output');
-        if (output) {
-            output.textContent = 'Free usage limit reached. Please login to continue.';
-        }
-        
-        // Show toast notification if available
-        if (typeof showToast === 'function') {
-            showToast('Free usage limit reached. Please login to continue.', 'error');
-        }
-        
-        return false; // Prevent execution
-    }
-    
-    // Show remaining runs toast if getting low
-    const remainingRuns = MAX_FREE_EXECUTIONS - codeExecutionCount;
-    if (remainingRuns <= 3 && remainingRuns > 0 && typeof showToast === 'function') {
-        showToast(`${remainingRuns} free runs remaining`, 'warning');
-    }
-    
-    return true; // Allow execution
-}
-
-// Function to increment execution count
-function incrementExecutionCount() {
-    // Only increment if user is not logged in
-    if (typeof auth === 'undefined' || !auth.currentUser) {
-        codeExecutionCount++;
-        localStorage.setItem('pythonPractice_execCount', codeExecutionCount);
-    }
-}
-
-// Custom input modal for Skulpt input()
-function showInputModal(promptText) {
+// Custom input modal for Skulpt input() - adapted from original skulpt-setup.js
+function showInputModalBasic(promptText) {
     return new Promise((resolve) => {
         // Create modal elements
         let modal = document.createElement('div');
-        modal.id = 'skulpt-input-modal';
+        modal.id = 'skulpt-input-modal'; // Keep ID for potential CSS
         modal.style.position = 'fixed';
         modal.style.top = '0';
         modal.style.left = '0';
@@ -138,22 +95,25 @@ function showInputModal(promptText) {
     });
 }
 
-// Configure Skulpt with Python 3 support
-function configureSkulpt() {
-    console.log('Sk object exists:', typeof Sk !== 'undefined');
+
+// Configure Skulpt with Python 3 support - adapted from original skulpt-setup.js
+function configureSkulptBasic() {
+    console.log('Configuring Skulpt for Basic Mode...');
     if (typeof Sk === 'undefined') {
         console.error('Skulpt not loaded!');
         return;
     }
 
-    // Configure Skulpt with dynamically updated future flags
     Sk.configure({
         output: function(text) {
             const output = document.getElementById('output');
-            if (output && output.textContent === "Running...") {
-                output.textContent = text;
-            } else if (output) {
-                output.textContent += text;
+            if (output) {
+                 // Clear "Running..." message on first output
+                if (output.textContent === "Running...") {
+                    output.textContent = text;
+                } else {
+                    output.textContent += text;
+                }
             }
         },
         read: function(x) {
@@ -161,52 +121,45 @@ function configureSkulpt() {
                 throw "File not found: '" + x + "'";
             return Sk.builtinFiles["files"][x];
         },
-        __future__: futureFlags,
-        execLimit: 10000,
+        __future__: futureFlagsBasic,
+        execLimit: 10000, // Basic limit
         timeoutMsg: function() {
             return "Program timed out. Possible infinite loop?";
         },
         inputfun: function(promptText) {
-            // Return a promise for Skulpt async input
-            return showInputModal(promptText);
+            return showInputModalBasic(promptText);
         },
         inputfunTakesPrompt: true
     });
 }
 
 // Function to run Python code using Skulpt with automatic flag detection
-function runPythonWithSkulpt(code, options = {}) {
-    // Check execution limit before running code
-    if (!checkExecutionLimit()) {
-        return; // Exit if limit is reached
-    }
-    
+async function runBasicPython(code) {
     const output = document.getElementById('output');
+    if (!output) return;
+
     output.textContent = "Running...";
-    lastExecutedCode = code; // Store the code for potential retry
-    
-    // Increment execution count before running code
-    incrementExecutionCount();
-    
+    lastExecutedCodeBasic = code; // Store the code for potential retry
+
     try {
         Sk.pre = "output";
-        // Merge passed options with default configuration
+        // Use the current futureFlagsBasic
         const config = {
             output: function(text) {
-                if (output && output.textContent === "Running...") {
+                 if (output.textContent === "Running...") {
                     output.textContent = text;
-                } else if (output) {
+                } else {
                     output.textContent += text;
                 }
             },
-            __future__: { ...futureFlags, ...(options.__future__ || {}) },
+            __future__: futureFlagsBasic,
             read: function(x) {
                 if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
                     throw "File not found: '" + x + "'";
                 return Sk.builtinFiles["files"][x];
             },
             inputfun: function(promptText) {
-                return showInputModal(promptText);
+                return showInputModalBasic(promptText);
             },
             inputfunTakesPrompt: true,
             execLimit: 10000,
@@ -214,53 +167,80 @@ function runPythonWithSkulpt(code, options = {}) {
                 return "Program timed out. Possible infinite loop?";
             }
         };
-        
-        // Configure Skulpt with merged options
+
         Sk.configure(config);
-        
-        Sk.misceval.asyncToPromise(function() {
+
+        await Sk.misceval.asyncToPromise(function() {
             return Sk.importMainWithBody("<stdin>", false, code, true);
-        }).then(function() {
-            if (output.textContent === "Running...") {
-                output.textContent = "Program executed successfully (no output)";
-            }
-        }, function(err) {
-            handleSkulptError(err, code);
         });
+
+        if (output.textContent === "Running...") {
+            output.textContent = "Program executed successfully (no output)";
+        }
+
     } catch(err) {
-        handleSkulptError(err, code);
+        handleBasicError(err, code);
     }
 }
 
-// Function to handle Skulpt errors and detect missing __future__ flags
-function handleSkulptError(err, code) {
+// Function to handle Skulpt errors and detect missing __future__ flags or advanced features
+function handleBasicError(err, code) {
     const output = document.getElementById('output');
     const errMsg = err.toString();
     output.textContent = errMsg;
-    
-    // Check if error is about a missing __future__ flag
-    const match = errMsg.match(/must specify Sk\.__future__\.(\w+) and it must be a boolean/);
-    if (match && match[1]) {
-        const missingFlag = match[1];
+
+    // Check if error is about a missing __future__ flag (Skulpt specific)
+    const flagMatch = errMsg.match(/must specify Sk\.__future__\.(\w+) and it must be a boolean/);
+    if (flagMatch && flagMatch[1]) {
+        const missingFlag = flagMatch[1];
         console.log(`Auto-adding missing __future__ flag: ${missingFlag}`);
-        
+
         // Add the missing flag
-        futureFlags[missingFlag] = true;
-        
+        futureFlagsBasic[missingFlag] = true;
+
         // Update Skulpt configuration with new flag
         Sk.configure({
-            __future__: futureFlags
+            __future__: futureFlagsBasic
         });
-        
+
         // Show a message that we're retrying with the new flag
         output.textContent = `Adding missing flag "${missingFlag}" and retrying...`;
-        
+
         // Retry execution with the fixed flags after a short delay
         setTimeout(() => {
-            runPythonWithSkulpt(code);
+            runBasicPython(code);
         }, 500);
+        return; // Handled this error
+    }
+
+    // Option A: Detect errors indicative of advanced features not supported by Skulpt
+    // This is a heuristic and might need refinement based on common Skulpt limitations
+    const advancedFeatureKeywords = [
+        "ImportError", // Often for unsupported libraries
+        "AttributeError", // For features on built-ins that Skulpt doesn't implement
+        "TypeError", // For unsupported operations
+        "SyntaxError", // For very modern syntax Skulpt might not support
+        "not implemented" // Skulpt's internal "not implemented" messages
+    ];
+
+    const isAdvancedError = advancedFeatureKeywords.some(keyword => errMsg.includes(keyword));
+
+    // If it looks like an advanced feature error and the user is NOT logged in
+    if (isAdvancedError && (typeof window.auth === 'undefined' || !window.auth.getCurrentUser())) {
+         if (typeof showToast === 'function') {
+            showToast('Please upgrade to Advanced by signing in for full Python features.', 'info');
+        }
+        // Optionally clear output or leave the error message
+        // output.textContent = 'Error: This feature requires the Advanced Mode.';
+    } else {
+        // It's a regular Skulpt error or an advanced error for a logged-in user
+        console.error("Skulpt Error:", err);
+        // The error message is already in the output
     }
 }
 
-// Initialize Skulpt when the page loads
-document.addEventListener('DOMContentLoaded', configureSkulpt);
+// Initialize Skulpt configuration on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', configureSkulptBasic);
+
+// Export run function
+window.runBasicPython = runBasicPython;

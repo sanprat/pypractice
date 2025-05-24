@@ -141,9 +141,11 @@ header h1::before {
     background-color: rgba(66, 133, 244, 0.05);
 }
 
+/* Content area now uses tab-based display */
 .content {
-    display: flex;
     flex: 1;
+    display: flex; /* Use flex to manage tab-content children */
+    flex-direction: column; /* Stack tab-content vertically */
     background-color: var(--white);
     box-shadow: var(--shadow-sm);
     margin: 1rem 2rem;
@@ -151,6 +153,18 @@ header h1::before {
     overflow: hidden;
 }
 
+.tab-content {
+    flex: 1; /* Allow tab content to fill the space */
+    display: none; /* Hidden by default, shown by JS */
+    flex-direction: column; /* Stack editor and output vertically */
+}
+
+.tab-content.active {
+    display: flex; /* Show active tab content */
+}
+
+
+/* Sidebar styles (kept but not used in new layout) */
 .sidebar {
     width: 250px;
     background-color: var(--white);
@@ -200,12 +214,16 @@ header h1::before {
     color: var(--dark-gray);
 }
 
+/* Main content area within tab-content */
 .main {
     flex: 1;
     display: flex;
     flex-direction: column;
     background-color: var(--white);
 }
+
+/* Removed .main.full-width as layout is now tab-controlled */
+
 
 .editor-container {
     flex: 1;
@@ -255,10 +273,6 @@ header h1::before {
     box-shadow: var(--shadow-md);
 }
 
-.toolbar button i {
-    margin-right: 6px;
-}
-
 .toolbar select {
     padding: 0.5rem;
     border: 1px solid var(--medium-gray);
@@ -267,7 +281,7 @@ header h1::before {
 }
 
 /* Container for CodeMirror instance */
-#editor {
+#editor, #editor-advanced { /* Apply to both editors */
     flex-grow: 1; /* Allow editor to fill available space */
     position: relative; /* Needed for CodeMirror elements */
     border-top: 1px solid var(--medium-gray); /* Add border like original */
@@ -281,10 +295,12 @@ header h1::before {
     line-height: 1.5;
 }
 
+/* Fixed height and scrollable output container */
 .output-container {
     display: flex;
     flex-direction: column;
-    height: 180px;
+    height: 180px; /* Fixed height */
+    border-top: 1px solid #444; /* Separator from editor */
 }
 
 .output-header {
@@ -295,6 +311,7 @@ header h1::before {
     background-color: #1e1e1e;
     color: #f0f0f0;
     border-bottom: 1px solid #444;
+    flex-shrink: 0; /* Prevent header from shrinking */
 }
 
 .output-header h3 {
@@ -316,12 +333,12 @@ header h1::before {
 }
 
 .output {
-    flex: 1;
+    flex: 1; /* Allow output content to fill remaining space in container */
     padding: 1rem;
     background-color: #2d2d2d;
     color: #f0f0f0;
     font-family: var(--font-code);
-    overflow-y: auto;
+    overflow-y: auto; /* Make output content scrollable */
     white-space: pre-wrap;
     line-height: 1.5;
     font-size: 14px;
@@ -400,37 +417,44 @@ header h1::before {
 
 /* Responsive styles */
 @media (max-width: 768px) {
-    .content {
-        flex-direction: column;
-        margin: 0;
-        border-radius: 0;
-    }
-    
-    .sidebar {
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid var(--medium-gray);
-        padding: 1rem;
+    body {
+        /* Adjust body padding/margin if needed */
     }
 
     header {
         padding: 0.8rem 1rem;
+        flex-direction: column; /* Stack header content vertically */
+        align-items: flex-start;
     }
 
     header h1 {
         font-size: 1.4rem;
+        margin-bottom: 0.5rem; /* Add space below title */
     }
-    
+
     header h1::before {
         width: 1.4rem;
         height: 1.4rem;
         margin-right: 0.4rem;
     }
 
+    .auth-buttons {
+        width: 100%; /* Make buttons take full width */
+        justify-content: space-around; /* Distribute buttons */
+    }
+
     .auth-buttons button {
         padding: 0.5rem 0.8rem;
         font-size: 0.9rem;
-        margin-left: 0.5rem;
+        margin-left: 0; /* Remove left margin */
+        flex: 1; /* Allow buttons to grow */
+        text-align: center;
+        justify-content: center;
+    }
+
+    .auth-buttons .login-button::before,
+    .auth-buttons .register-button::before {
+        margin-right: 4px;
     }
 
     .tabs {
@@ -443,37 +467,90 @@ header h1::before {
         font-size: 0.9rem;
         flex: 1;
     }
-    
+
     .tab i {
         margin-right: 0.2rem;
     }
-    
+
+    .mode-info {
+        padding: 0.5rem 1rem; /* Add padding to info block */
+        font-size: 0.9rem;
+    }
+
+    .content {
+        flex-direction: column;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    .tab-content {
+        flex-direction: column; /* Stack editor and output vertically */
+    }
+
+    .main {
+        width: 100%; /* Main content takes full width within tab-content */
+    }
+
     .editor-container {
         border-radius: 0;
     }
-    
+
     .toolbar {
         padding: 0.6rem;
         flex-wrap: wrap;
     }
-    
+
     .toolbar-left, .toolbar-right {
         margin-bottom: 0.5rem;
+        width: 100%; /* Make toolbar sections full width */
+        justify-content: space-around; /* Distribute buttons/selectors */
     }
-    
+
+    .toolbar button {
+         margin: 0 0.2rem; /* Adjust button spacing */
+         flex: 1; /* Allow buttons to grow */
+         justify-content: center;
+    }
+
     .output-container {
         height: 250px; /* Increased from default to 250px for more space on mobile */
     }
-    
-    .auth-buttons .login-button::before,
-    .auth-buttons .register-button::before {
-        margin-right: 4px;
-    }
-    
+
     /* Enhance buttons for better touch targets */
     button {
         min-height: 44px; /* Minimum touch target size */
     }
+
+    .readme-content {
+        padding: 1rem; /* Adjust padding for smaller screens */
+    }
+
+    /* Modal adjustments for smaller screens */
+    .modal-content {
+        margin: 5% auto; /* Adjust margin */
+        width: 95%; /* Increase width */
+    }
+}
+
+/* Tablet styles (adjust as needed for screens between 769px and a larger breakpoint) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    header {
+        padding: 1rem 1.5rem;
+    }
+
+    .content {
+        margin: 1rem 1.5rem;
+    }
+
+    .tabs {
+        padding: 0 1.5rem;
+    }
+
+    .tab {
+        padding: 1rem 1rem;
+    }
+
+    /* Removed fixed height for output container */
 }
 
 /* Python syntax highlighting */
@@ -691,8 +768,9 @@ header h1::before {
     transition: opacity 0.2s;
 }
 
-.code-actions button i {
-    margin-right: 5px;
+.code-actions button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
 }
 
 .load-code-btn {
@@ -717,30 +795,440 @@ header h1::before {
     font-style: italic;
 }
 
-.loading {
-    text-align: center;
+.mode-info p {
+    margin: 0.3rem 0;
+}
+
+.content {
+    flex: 1;
+    display: flex; /* Use flex to manage tab-content children */
+    flex-direction: column; /* Stack tab-content vertically */
+    background-color: var(--white);
+    box-shadow: var(--shadow-sm);
+    margin: 1rem 2rem;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--white);
+}
+
+/* Style for disabled Advanced Mode tab */
+.tab.disabled {
+    color: var(--medium-gray);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.tab.disabled:hover {
+    color: var(--medium-gray); /* Prevent color change on hover */
+    background-color: transparent; /* Prevent background change on hover */
+}
+
+/* Theme Toggle Button Style */
+#theme-toggle-btn {
+    background: none;
+    border: none;
+    color: var(--white); /* Icon color in header */
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-left: 0.8rem;
+    padding: 0.5rem; /* Adjust padding for icon button */
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#theme-toggle-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: none; /* Prevent translateY effect */
+    box-shadow: none; /* Prevent shadow effect */
+}
+
+/* Dark Mode Styles */
+body.dark-mode {
+    --primary-color: #5e9bff; /* Lighter primary for dark background */
+    --primary-dark: #4285f4;
+    --secondary-color: #57b846; /* Adjusted secondary */
+    --accent-color: #f4b400; /* Adjusted accent */
+    --danger-color: #e06c75; /* Adjusted danger */
+    --light-gray: #282c34; /* Dark background */
+    --medium-gray: #3a3f4b; /* Darker gray for borders/separators */
+    --dark-gray: #abb2bf; /* Lighter gray for text */
+    --text-color: #abb2bf; /* Default text color */
+    --white: #1e1e1e; /* Dark background for elements */
+
+    background-color: var(--light-gray);
+    color: var(--text-color);
+}
+
+body.dark-mode header {
+    background-color: #1e1e1e;
+    background-image: linear-gradient(to right, #1e1e1e, #282c34);
+    color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+body.dark-mode header h1::before {
+     /* If you have a dark mode icon, update here */
+     /* content: ''; */
+}
+
+body.dark-mode .auth-buttons button {
+    background-color: var(--medium-gray);
+    color: var(--primary-color);
+    border: 1px solid var(--medium-gray);
+}
+
+body.dark-mode .auth-buttons button:hover {
+    background-color: #4a515f;
+    box-shadow: var(--shadow-sm);
+}
+
+body.dark-mode #theme-toggle-btn {
+    color: #fff; /* White icon in dark header */
+}
+
+body.dark-mode #theme-toggle-btn:hover {
+     background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+body.dark-mode .tabs {
+    background-color: var(--white);
+    border-bottom-color: var(--medium-gray);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+body.dark-mode .tab {
+    color: var(--dark-gray);
+}
+
+body.dark-mode .tab:hover {
+    color: var(--primary-color);
+    background-color: rgba(94, 155, 255, 0.1); /* Lighter primary with alpha */
+}
+
+body.dark-mode .tab.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    background-color: rgba(94, 155, 255, 0.1);
+}
+
+body.dark-mode .tab.disabled {
+    color: #666; /* Darker gray for disabled in dark mode */
+    opacity: 0.5;
+}
+
+body.dark-mode .tab.disabled:hover {
     color: #666;
-    padding: 20px;
+    background-color: transparent;
 }
 
-/* Add this to your existing modal styles */
-#save-code-dialog .modal-content,
-#my-codes-modal .modal-content {
-    max-width: 600px;
-    max-height: 80vh;
-    overflow-y: auto;
+
+body.dark-mode .content {
+    background-color: var(--white);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-#save-code-form .form-actions button {
+body.dark-mode .readme-panel {
+    background-color: var(--white);
+    border-right-color: var(--medium-gray);
+}
+
+body.dark-mode .readme-panel h2 {
+    color: var(--primary-color);
+    border-bottom-color: var(--medium-gray);
+}
+
+body.dark-mode .readme-panel a {
+    color: var(--primary-color);
+}
+
+
+body.dark-mode .main {
+    background-color: var(--white);
+}
+
+body.dark-mode .editor-container {
+    border-bottom-color: var(--medium-gray);
+}
+
+body.dark-mode .toolbar {
+    background-color: var(--light-gray);
+    border-bottom-color: var(--medium-gray);
+}
+
+body.dark-mode .toolbar button {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+body.dark-mode .toolbar button:hover {
+    background-color: var(--primary-dark);
+}
+
+body.dark-mode .toolbar select {
+    border-color: var(--medium-gray);
+    background-color: var(--white);
+    color: var(--text-color);
+}
+
+body.dark-mode #editor {
+    border-top-color: var(--medium-gray);
+}
+
+/* CodeMirror theme is handled by its own CSS, but ensure background matches */
+body.dark-mode .CodeMirror {
+    background-color: #282c34 !important; /* Match body background */
+    color: var(--text-color);
+}
+
+/* Override CodeMirror theme specific colors if needed */
+body.dark-mode .CodeMirror .cm-keyword { color: #c678dd; } /* Purple */
+body.dark-mode .CodeMirror .cm-string { color: #98c379; } /* Green */
+body.dark-mode .CodeMirror .cm-number { color: #d19a66; } /* Orange */
+body.dark-mode .CodeMirror .cm-comment { color: #5c6370; font-style: italic; } /* Gray */
+body.dark-mode .CodeMirror .cm-def { color: #61afef; } /* Blue */
+body.dark-mode .CodeMirror .cm-variable { color: #e06c75; } /* Red */
+body.dark-mode .CodeMirror .cm-property { color: #56b6c2; } /* Cyan */
+body.dark-mode .CodeMirror .cm-builtin { color: #e6c07b; } /* Yellow */
+
+
+body.dark-mode .output-container {
+    /* Output container background is already dark */
+}
+
+body.dark-mode .output-header {
+    background-color: #1e1e1e;
+    color: #f0f0f0;
+    border-bottom-color: #444;
+}
+
+body.dark-mode .output-header button {
+    color: #f0f0f0;
+}
+
+body.dark-mode .output-header button:hover {
+    color: var(--primary-color);
+}
+
+body.dark-mode .output {
+    background-color: #282c34; /* Match body background */
+    color: #abb2bf; /* Lighter text */
+}
+
+body.dark-mode .tooltip .tooltiptext {
+    background-color: #444;
+    color: #eee;
+}
+
+body.dark-mode .toast {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+body.dark-mode .toast.error {
+    background-color: var(--danger-color);
+}
+
+body.dark-mode .toast.success {
     background-color: var(--secondary-color);
 }
 
-.error {
-    color: var(--danger-color);
-    text-align: center;
-    padding: 10px;
-    border-radius: 4px;
-    background-color: rgba(234, 67, 53, 0.1);
-    margin: 10px 0;
+body.dark-mode .modal-content {
+    background-color: #3a3f4b; /* Dark background for modals */
+    color: var(--text-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
+body.dark-mode .modal-content h2 {
+    color: var(--primary-color);
+}
+
+body.dark-mode .close {
+    color: #abb2bf;
+}
+
+body.dark-mode .close:hover {
+    color: #fff;
+}
+
+body.dark-mode .form-group label {
+    color: var(--text-color);
+}
+
+body.dark-mode .form-group input {
+    background-color: #282c34;
+    color: var(--text-color);
+    border-color: #555;
+}
+
+body.dark-mode .form-actions button {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+body.dark-mode .form-actions button:hover {
+    background-color: #45a049;
+}
+
+body.dark-mode .form-message.error {
+    background-color: #4a1e22;
+    color: #e06c75;
+    border-color: #7c2a30;
+}
+
+body.dark-mode .form-message.success {
+    background-color: #2a4a2e;
+    color: #98c379;
+    border-color: #4f7c52;
+}
+
+body.dark-mode .user-profile-button {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+body.dark-mode .user-profile-button:hover {
+    background-color: #45a049;
+}
+
+body.dark-mode .user-dropdown {
+    background-color: #3a3f4b;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .user-dropdown a {
+    color: var(--text-color);
+}
+
+body.dark-mode .user-dropdown a:hover {
+    background-color: #4a515f;
+}
+
+body.dark-mode .saved-code-item {
+    background-color: #3a3f4b;
+    border-color: #555;
+}
+
+body.dark-mode .saved-code-item h3 {
+    color: var(--primary-color);
+}
+
+body.dark-mode .code-date {
+    color: #abb2bf;
+}
+
+body.dark-mode .load-code-btn {
+    background-color: var(--secondary-color);
+}
+
+body.dark-mode .delete-code-btn {
+    background-color: var(--danger-color);
+}
+
+body.dark-mode .no-codes,
+body.dark-mode .loading {
+    color: #abb2bf;
+}
+
+body.dark-mode #save-code-form .form-actions button {
+    background-color: var(--secondary-color);
+}
+
+body.dark-mode .error {
+    color: var(--danger-color);
+    background-color: rgba(224, 108, 117, 0.1);
+    border-color: rgba(224, 108, 117, 0.3);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .content {
+        flex-direction: column;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    header {
+        padding: 0.8rem 1rem;
+    }
+
+    header h1 {
+        font-size: 1.4rem;
+    }
+
+    header h1::before {
+        width: 1.4rem;
+        height: 1.4rem;
+        margin-right: 0.4rem;
+    }
+
+    .auth-buttons button {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.9rem;
+        margin-left: 0.5rem;
+    }
+
+    .tabs {
+        padding: 0;
+        justify-content: space-around;
+    }
+
+    .tab {
+        padding: 0.8rem 0.5rem;
+        font-size: 0.9rem;
+        flex: 1;
+    }
+
+    .tab i {
+        margin-right: 0.2rem;
+    }
+
+    .editor-container {
+        border-radius: 0;
+    }
+
+    .toolbar {
+        padding: 0.6rem;
+        flex-wrap: wrap;
+    }
+
+    .toolbar-left, .toolbar-right {
+        margin-bottom: 0.5rem;
+    }
+
+    .output-container {
+        height: 250px; /* Increased from default to 250px for more space on mobile */
+    }
+
+    .auth-buttons .login-button::before,
+    .auth-buttons .register-button::before {
+        margin-right: 4px;
+    }
+
+    /* Enhance buttons for better touch targets */
+    button {
+        min-height: 44px; /* Minimum touch target size */
+    }
+
+    /* Responsive adjustments for tab-content layout */
+    .tab-content {
+        flex-direction: column; /* Stack editor and output vertically */
+    }
+
+    .main {
+        width: 100%; /* Main content takes full width within tab-content */
+    }
+
+    .readme-content {
+        padding: 1rem; /* Adjust padding for smaller screens */
+    }
+}
