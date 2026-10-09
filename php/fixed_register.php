@@ -24,11 +24,15 @@ if (file_exists($configFile)) {
     $username = $db_user;
     $password = $db_pass;
 } else {
-    // Default configuration - for Hostinger environment
-    $host = 'localhost'; // Use 'localhost' for local connections
-    $dbname = 'u486120778_zenalys';
-    $username = 'u486120778_sanprat';
-    $password = 'LetsLearn@2025';
+    // No hardcoded fallback: read from environment (getenv) or fail loudly.
+    // Secrets must never live in source control.
+    $host = getenv('DB_HOST') ?: 'localhost';
+    $dbname = getenv('DB_NAME') ?: '';
+    $username = getenv('DB_USER') ?: '';
+    $password = getenv('DB_PASS') ?: '';
+    if ($dbname === '' || $username === '' || $password === '') {
+        die(json_encode(['error' => 'Database configuration missing. Set DB_HOST/DB_NAME/DB_USER/DB_PASS environment variables.']));
+    }
 }
 
 // Database connection
